@@ -115,15 +115,18 @@ public class LogicSolver {
             f += 2;
         }
 
-        int k = indexOpenBracket + 1;
 
         //build innerTokens
         ArrayList<String> innerTokens = new ArrayList<>();
+        int peers = bracketPeers.size()/2;
 
-        while (k < indexCloseBracket) {
-            innerTokens.add(tokens.get(k));
-            k++;
-            System.out.println("TESTTestTEST:         " + innerTokens);
+        for (int l = 0; l < peers; l ++){
+            int indexPeer = bracketPeers.get(l);
+            while (indexPeer < bracketPeers.get(l + 1)){
+                innerTokens.add(tokens.get(l));
+                l++;
+                System.out.println("InnerTokens now : " + innerTokens);
+            }
         }
 
         //set first value
