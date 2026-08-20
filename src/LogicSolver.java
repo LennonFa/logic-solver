@@ -1,0 +1,170 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class LogicSolver {
+    public static void main(String[] args){
+        //boolean[] values = {false, true};
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Enter formula: ");
+        String formula = scanner.nextLine();
+
+        System.out.println("How many variables? ");
+        int variableCount = scanner.nextInt();
+
+        int combinations = 1 << variableCount;
+        int solution = -1;
+        int checks = 0;
+        boolean[] variables = new boolean[variableCount];
+        boolean satisfiable = false;
+
+        ArrayList<String> tokens = new ArrayList<>();
+
+        for (int i = 0; i < formula.length(); i++){
+            char c = formula.charAt(i);
+            if (c == ' '){
+                continue;
+            }
+            if (c == '&' && i + 1 < formula.length()){
+                if (formula.charAt(i+1) == '&'){
+                    tokens.add("&&");
+                    System.out.println("AND detected");
+                    i++;
+                    continue;
+                }
+            }
+            if (c == '|' && i + 1 < formula.length()){
+                if (formula.charAt(i+1) == '|'){
+                    tokens.add("||");
+                    System.out.println("OR detected");
+                    i++;
+                    continue;
+                }
+            }
+
+            if (c == '(' || c == ')' || c == '!'){
+
+                tokens.add(String.valueOf(c));
+            }
+
+
+            if (Character.isLetter(c)){
+                tokens.add(String.valueOf(c));
+            }
+            System.out.println(c);
+        }
+        for (String token : tokens){
+            System.out.println(token);
+        }
+
+        System.out.println("You entered: " + formula);
+
+        for (int i = 0; i < combinations; i ++){
+            checks++;
+
+            for (int bit = 0; bit < variableCount; bit++){
+                int mask = 1 << bit;
+
+                variables[bit] = (i & mask) != 0;
+            }
+            boolean result = evaluate(tokens, variables);
+            if (result){
+                satisfiable = true;
+                solution = i;
+                break;}
+        }
+        if (satisfiable){
+            System.out.println("SAT");
+            System.out.println("Checks to complete: " + checks);
+            for (int bit = 0; bit < variableCount; bit++){
+                int mask = 1 << bit;
+
+                boolean value = (solution & mask) != 0;
+
+                System.out.println("Variable["+ bit + "]" + value);
+
+            }
+        } else {
+            System.out.println("UNSAT");
+            System.out.println("Checks to complete: " + checks);
+        }
+    }
+
+    static boolean evaluate(ArrayList<String> tokens, boolean[] values) {
+
+        boolean currentGroup;
+        int indexOpenBracket = -1;
+        int indexCloseBracket = -1;
+
+
+        for (int j = 0; j < tokens.size(); j++){
+            if (tokens.get(j).equals("(")){
+                indexOpenBracket = j;
+                System.out.println("opening bracket at " + j );
+            }
+            if (tokens.get(j).equals(")")){
+                indexCloseBracket = j;
+                System.out.println("closing bracket at " + j );
+            }
+        }
+
+        int k = indexOpenBracket + 1;
+
+        ArrayList<String> innerTokens = new ArrayList<>();
+
+        while (k < indexCloseBracket) {
+            innerTokens.add(tokens.get(k));
+            k++;
+            System.out.println("TESTTestTEST:         " + innerTokens);
+        }
+
+        String firstToken = tokens.get(0);
+        int i;
+        boolean resultSoFar = false;
+
+        if (tokens.get(0).equals("!")) {
+            i = 2;
+            currentGroup = !values[tokens.get(1).charAt(0) - 'a'];
+
+        } else {
+            i = 1;
+            int firstIndex = firstToken.charAt(0) - 'a';
+            currentGroup = values[firstIndex];
+        }
+
+
+        while (i < tokens.size()){
+            if (tokens.get(i).equals("&&")){
+                if (tokens.get(i+1).equals("!")){
+                    int indexRight = tokens.get(i +2).charAt(0) - 'a';
+                    boolean valueRight = !values[indexRight];
+                    currentGroup = currentGroup && valueRight;
+                    i++;
+                } else {
+                    int indexRight = tokens.get(i + 1).charAt(0) - 'a';
+                    boolean valueRight = values[indexRight];
+                    currentGroup = currentGroup && valueRight;
+                }
+
+            } else if (tokens.get(i).equals("||")) {
+                if (tokens.get(i+1).equals("!")){
+                    int indexRight = tokens.get(i+2).charAt(0) - 'a';
+                    boolean valueRight = !values[indexRight];
+                    resultSoFar = resultSoFar || currentGroup;
+                    currentGroup = valueRight;
+                    i++;
+                } else {
+                    int index = tokens.get(i + 1).charAt(0) - 'a';
+                    boolean valueRight = values[index];
+                    resultSoFar = resultSoFar || currentGroup;
+                    currentGroup = valueRight;
+                }
+            } else {
+                throw new IllegalArgumentException("error");
+            }
+            i+= 2;
+        }
+        resultSoFar = resultSoFar || currentGroup;
+        return resultSoFar;
+    }
+}
