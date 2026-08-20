@@ -96,7 +96,7 @@ public class LogicSolver {
         int indexOpenBracket = -1;
         int indexCloseBracket = -1;
 
-
+        //search bracket
         for (int j = 0; j < tokens.size(); j++){
             if (tokens.get(j).equals("(")){
                 indexOpenBracket = j;
@@ -110,6 +110,7 @@ public class LogicSolver {
 
         int k = indexOpenBracket + 1;
 
+        //build innerTokens
         ArrayList<String> innerTokens = new ArrayList<>();
 
         while (k < indexCloseBracket) {
@@ -118,10 +119,16 @@ public class LogicSolver {
             System.out.println("TESTTestTEST:         " + innerTokens);
         }
 
+        //set first value
         String firstToken = tokens.get(0);
         int i;
         boolean resultSoFar = false;
 
+        if (tokens.get(0).equals("(")){
+            boolean bracketResult = evaluate(innerTokens, values);
+            currentGroup = bracketResult;
+            i = indexCloseBracket + 1;
+        }
         if (tokens.get(0).equals("!")) {
             i = 2;
             currentGroup = !values[tokens.get(1).charAt(0) - 'a'];
@@ -132,7 +139,7 @@ public class LogicSolver {
             currentGroup = values[firstIndex];
         }
 
-
+        //calculate
         while (i < tokens.size()){
             if (tokens.get(i).equals("&&")){
                 if (tokens.get(i+1).equals("!")){
