@@ -141,11 +141,15 @@ public class LogicSolver {
         //calculate
         while (i < tokens.size()){
             if (tokens.get(i).equals("&&")){
-                if (tokens.get(i+1).equals("!")){
-                    int indexRight = tokens.get(i +2).charAt(0) - 'a';
+                if (tokens.get(i + 1).equals("!")){
+                    int indexRight = tokens.get(i + 2).charAt(0) - 'a';
                     boolean valueRight = !values[indexRight];
                     currentGroup = currentGroup && valueRight;
                     i++;
+                } else if (tokens.get(i  + 1).equals("(")){
+                    boolean valueRight = evaluate(innerTokens, values);
+                    currentGroup = currentGroup && valueRight;
+
                 } else {
                     int indexRight = tokens.get(i + 1).charAt(0) - 'a';
                     boolean valueRight = values[indexRight];
@@ -154,7 +158,7 @@ public class LogicSolver {
 
             } else if (tokens.get(i).equals("||")) {
                 if (tokens.get(i+1).equals("!")){
-                    int indexRight = tokens.get(i+2).charAt(0) - 'a';
+                    int indexRight = tokens.get(i + 2).charAt(0) - 'a';
                     boolean valueRight = !values[indexRight];
                     resultSoFar = resultSoFar || currentGroup;
                     currentGroup = valueRight;
@@ -165,6 +169,7 @@ public class LogicSolver {
                     resultSoFar = resultSoFar || currentGroup;
                     currentGroup = valueRight;
                 }
+
             } else {
                 throw new IllegalArgumentException("error");
             }
