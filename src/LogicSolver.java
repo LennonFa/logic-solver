@@ -90,7 +90,7 @@ public class LogicSolver {
         }
     }
 
-    static boolean evaluate(ArrayList<String> tokens, boolean[] values) {
+    static boolean evaluateOld(ArrayList<String> tokens, boolean[] values) {
 
         boolean currentGroup;
         int indexOpenBracket = -1;
@@ -127,9 +127,9 @@ public class LogicSolver {
             while (tokenIndex < indexCloseBracket){
                 innerTokens.add(tokens.get(tokenIndex));
                 tokenIndex++;
-                l++;
                 System.out.println("InnerTokens now : " + innerTokens);
             }
+            l++;
         }
 
         //set first value
@@ -138,7 +138,7 @@ public class LogicSolver {
         boolean resultSoFar = false;
 
         if (tokens.get(0).equals("(")){
-            boolean bracketResult = evaluate(innerTokens, values);
+            boolean bracketResult = evaluateOld(innerTokens, values);
             currentGroup = bracketResult;
             i = indexCloseBracket + 1;
         } else if (tokens.get(0).equals("!")) {
@@ -160,7 +160,7 @@ public class LogicSolver {
                     currentGroup = currentGroup && valueRight;
                     i++;
                 } else if (tokens.get(i  + 1).equals("(")){
-                    boolean valueRight = evaluate(innerTokens, values);
+                    boolean valueRight = evaluateOld(innerTokens, values);
                     currentGroup = currentGroup && valueRight;
                     i = indexCloseBracket + 1;
                     continue;
@@ -178,7 +178,7 @@ public class LogicSolver {
                     currentGroup = valueRight;
                     i++;
                 } else if (tokens.get(i + 1).equals("(")){
-                    boolean valueRight = evaluate(innerTokens, values);
+                    boolean valueRight = evaluateOld(innerTokens, values);
                     resultSoFar = resultSoFar || currentGroup;
                     currentGroup = valueRight;
                     i = indexCloseBracket + 1;
