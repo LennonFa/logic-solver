@@ -10,7 +10,8 @@ public class Parser {
         this.values = values;
     }
 
-    boolean parse() {
-        return;
+    boolean parsePrimary(){
+        return values[tokens.get(position) - 'a'];
+        position++;
     }
 }

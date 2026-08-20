@@ -67,7 +67,7 @@ public class LogicSolver {
 
                 variables[bit] = (i & mask) != 0;
             }
-            boolean result = evaluate(tokens, variables);
+            boolean result = evaluateOld(tokens, variables);
             if (result){
                 satisfiable = true;
                 solution = i;
