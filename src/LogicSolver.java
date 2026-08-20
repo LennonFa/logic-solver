@@ -95,17 +95,24 @@ public class LogicSolver {
         boolean currentGroup;
         int indexOpenBracket = -1;
         int indexCloseBracket = -1;
+        ArrayList<Integer> bracketsStack = new ArrayList<>();
+        ArrayList<Integer> bracketPeers = new ArrayList<>();
 
         //search bracket
         for (int j = 0; j < tokens.size(); j++){
             if (tokens.get(j).equals("(")){
-                indexOpenBracket = j;
-                System.out.println("opening bracket at " + j );
+                bracketsStack.add(j);
             }
             if (tokens.get(j).equals(")")){
-                indexCloseBracket = j;
-                System.out.println("closing bracket at " + j );
+                bracketPeers.add(bracketsStack.getLast());
+                bracketPeers.add(j);
+                bracketsStack.removeLast();
             }
+        }
+        int f = 0;
+        while (f < bracketPeers.size() - 1){
+            System.out.println("Peer " + bracketPeers.get(f) + " ... " + bracketPeers.get(f + 1));
+            f += 2;
         }
 
         int k = indexOpenBracket + 1;
