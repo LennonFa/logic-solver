@@ -128,8 +128,7 @@ public class LogicSolver {
             boolean bracketResult = evaluate(innerTokens, values);
             currentGroup = bracketResult;
             i = indexCloseBracket + 1;
-        }
-        if (tokens.get(0).equals("!")) {
+        } else if (tokens.get(0).equals("!")) {
             i = 2;
             currentGroup = !values[tokens.get(1).charAt(0) - 'a'];
 
