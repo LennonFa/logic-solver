@@ -47,6 +47,16 @@ public class Parser {
     }
 
     boolean parsePrimary() {
+        if (tokens.get(position).equals("(")){
+            position++;
+            boolean value = parseOr();
+
+            if (tokens.get(position).equals(")")){
+                position++;
+                return value;
+            }
+        }
+
         String token = tokens.get(position);            //token = tokens at current parse position
         int index = token.charAt(0) - 'a';              //index = firsCharacter of the token - 'a'     (c - a = 2)
         boolean value = values[index];                  //boolean value in values at index (values[2])
