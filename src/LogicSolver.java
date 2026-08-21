@@ -67,7 +67,11 @@ public class LogicSolver {
 
                 variables[bit] = (i & mask) != 0;
             }
-            boolean result = evaluateOld(tokens, variables);
+            //boolean result = evaluateOld(tokens, variables);
+
+            Parser parser = new Parser(tokens, variables);
+            boolean result = parser.parseOr();
+
             if (result){
                 satisfiable = true;
                 solution = i;
