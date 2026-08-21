@@ -13,11 +13,30 @@ public class Parser {
 
 
     boolean parseOr() {
-        return parseAnd();
+        boolean value = parseAnd();
+
+        if(position < tokens.size()){
+            while (tokens.get(position).equals("||")){
+                position++;
+                boolean right = parseAnd();
+                return value || right;
+            }
+        }
+
+        return value;
     }
 
     boolean parseAnd() {
-        return parseUnary();
+        boolean value = parseUnary();
+
+        if(position < tokens.size())
+            while (tokens.get(position).equals("&&")){
+                position++;
+                boolean right = parseUnary();
+                return value && right;
+            }
+
+        return value;
     }
 
     boolean parseUnary() {
@@ -37,6 +56,4 @@ public class Parser {
         position++;
         return value;                                   //return the value (true/false)
     }
-
-
 }
