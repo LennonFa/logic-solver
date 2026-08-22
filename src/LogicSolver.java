@@ -9,13 +9,14 @@ public class LogicSolver {
         System.out.println("Enter formula: ");
         String formula = scanner.nextLine();
 
-        System.out.println("How many variables? ");
-        int variableCount = scanner.nextInt();
+        //System.out.println("How many variables? ");
+        //int variableCount = scanner.nextInt();
 
-        int combinations = 1 << variableCount;
+
         int solution = -1;
         int checks = 0;
-        boolean[] variables = new boolean[variableCount];
+        int highestVariableIndex = -1;
+
         boolean satisfiable = false;
 
         ArrayList<String> tokens = new ArrayList<>();
@@ -50,9 +51,18 @@ public class LogicSolver {
 
             if (Character.isLetter(c)){
                 tokens.add(String.valueOf(c));
+                int variableIndex = c - 'a';
+                if (variableIndex > highestVariableIndex) {
+                    highestVariableIndex = variableIndex;
+                }
             }
             System.out.println(c);
         }
+
+        int variableCount = highestVariableIndex + 1;
+        int combinations = 1 << variableCount;
+        boolean[] variables = new boolean[variableCount];
+
         for (String token : tokens){
             System.out.println(token);
         }

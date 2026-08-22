@@ -76,9 +76,10 @@ public class Parser {
 
         String token = tokens.get(position);            //token = tokens at current parse position
 
-        if (!Character.isLetter(token.charAt(0))){
+        if (token.length() != 1 || token.charAt(0) < 'a' || token.charAt(0) > 'z') {
             throw new IllegalArgumentException("no valid variable");
         }
+
         int index = token.charAt(0) - 'a';              //index = firsCharacter of the token - 'a'     (c - a = 2)
         boolean value = values[index];                  //boolean value in values at index (values[2])
         position++;
