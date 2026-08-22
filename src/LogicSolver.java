@@ -21,21 +21,21 @@ public class LogicSolver {
 
         ArrayList<String> tokens = new ArrayList<>();
 
-        for (int i = 0; i < formula.length(); i++){
+        for (int i = 0; i < formula.length(); i++) {
             char c = formula.charAt(i);
-            if (c == ' '){
+            if (c == ' ') {
                 continue;
             }
-            if (c == '&' && i + 1 < formula.length()){
-                if (formula.charAt(i+1) == '&'){
+            if (c == '&' && i + 1 < formula.length()) {
+                if (formula.charAt(i+1) == '&') {
                     tokens.add("&&");
                     System.out.println("AND detected");
                     i++;
                     continue;
                 }
             }
-            if (c == '|' && i + 1 < formula.length()){
-                if (formula.charAt(i+1) == '|'){
+            if (c == '|' && i + 1 < formula.length()) {
+                if (formula.charAt(i+1) == '|') {
                     tokens.add("||");
                     System.out.println("OR detected");
                     i++;
@@ -43,13 +43,13 @@ public class LogicSolver {
                 }
             }
 
-            if (c == '(' || c == ')' || c == '!'){
+            if (c == '(' || c == ')' || c == '!') {
 
                 tokens.add(String.valueOf(c));
             }
 
 
-            if (Character.isLetter(c)){
+            if (c >= 'a' && c <= 'z') {
                 tokens.add(String.valueOf(c));
                 int variableIndex = c - 'a';
                 if (variableIndex > highestVariableIndex) {
