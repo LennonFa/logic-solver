@@ -10,6 +10,10 @@ public class LogicSolver {
         System.out.println("Enter formula: ");
         String formula = scanner.nextLine();
 
+        if (formula.isBlank()) {
+            throw new IllegalArgumentException("No input");
+        }
+
         //System.out.println("How many variables? ");
         //int variableCount = scanner.nextInt();
 
@@ -30,7 +34,6 @@ public class LogicSolver {
             if (c == '&' && i + 1 < formula.length()) {
                 if (formula.charAt(i+1) == '&') {
                     tokens.add("&&");
-                    System.out.println("AND detected");
                     i++;
                     continue;
                 }
@@ -38,7 +41,6 @@ public class LogicSolver {
             if (c == '|' && i + 1 < formula.length()) {
                 if (formula.charAt(i+1) == '|') {
                     tokens.add("||");
-                    System.out.println("OR detected");
                     i++;
                     continue;
                 }
@@ -66,10 +68,6 @@ public class LogicSolver {
         int variableCount = highestVariableIndex + 1;
         int combinations = 1 << variableCount;
         boolean[] variables = new boolean[variableCount];
-
-        for (String token : tokens){
-            System.out.println(token);
-        }
 
         System.out.println("You entered: " + formula);
 
