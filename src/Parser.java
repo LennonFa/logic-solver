@@ -62,9 +62,15 @@ public class Parser {
             position++;
             boolean value = parseOr();
 
-            if (tokens.get(position).equals(")")){
+            if (position >= tokens.size()) {
+                throw new IllegalArgumentException("closing-bracket is missing!");
+
+            } else if (tokens.get(position).equals(")")) {
                 position++;
                 return value;
+
+            } else {
+                throw new IllegalArgumentException("closing-bracket was expected");
             }
         }
 
