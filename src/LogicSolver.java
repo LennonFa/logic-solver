@@ -70,7 +70,7 @@ public class LogicSolver {
             //boolean result = evaluateOld(tokens, variables);
 
             Parser parser = new Parser(tokens, variables);
-            boolean result = parser.parseOr();
+            boolean result = parser.parse();
 
             if (result){
                 satisfiable = true;

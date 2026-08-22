@@ -10,6 +10,14 @@ public class Parser {
         this.values = values;
     }
 
+    boolean parse(){
+        boolean value = parseOr();
+        if (position == tokens.size()){
+            return value;
+        } else {
+            throw new IllegalArgumentException("FORMULA ERROR: ");
+        }
+    }
 
 
     boolean parseOr() {
