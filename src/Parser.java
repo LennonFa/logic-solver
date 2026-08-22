@@ -5,25 +5,25 @@ public class Parser {
     private final boolean[] values;
     private int position = 0;
 
-    Parser(ArrayList<String> tokens, boolean[] values){
+    Parser(ArrayList<String> tokens, boolean[] values) {
         this.tokens = tokens;
         this.values = values;
     }
 
     boolean parse(){
         boolean value = parseOr();
-        if (position == tokens.size()){
-            return value;
-        } else {
+        if (position != tokens.size()) {
             throw new IllegalArgumentException("FORMULA ERROR: ");
         }
+
+        return value;
     }
 
 
     boolean parseOr() {
         boolean value = parseAnd();
 
-            while (position < tokens.size() && tokens.get(position).equals("||") ){
+            while (position < tokens.size() && tokens.get(position).equals("||") ) {
                 position++;
                 boolean right = parseAnd();
                 value = value || right;
@@ -35,7 +35,7 @@ public class Parser {
     boolean parseAnd() {
         boolean value = parseUnary();
 
-            while (position < tokens.size() && tokens.get(position).equals("&&")){
+            while (position < tokens.size() && tokens.get(position).equals("&&")) {
                 position++;
                 boolean right = parseUnary();
                 value = value && right;
@@ -45,7 +45,10 @@ public class Parser {
     }
 
     boolean parseUnary() {
-        if (tokens.get(position).equals("!")){
+        if (position >= tokens.size()) {
+             throw new IllegalArgumentException("Variable is expected");
+        }
+        if (tokens.get(position).equals("!")) {
             position++;
             boolean value = parseUnary();
             return !value;
