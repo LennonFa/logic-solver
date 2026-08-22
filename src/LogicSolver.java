@@ -6,6 +6,7 @@ public class LogicSolver {
         //boolean[] values = {false, true};
         Scanner scanner = new Scanner(System.in);
 
+        System.out.println("Variables valid: a - z");
         System.out.println("Enter formula: ");
         String formula = scanner.nextLine();
 
@@ -54,9 +55,10 @@ public class LogicSolver {
                 int variableIndex = c - 'a';
                 if (variableIndex > highestVariableIndex) {
                     highestVariableIndex = variableIndex;
+                    continue;
                 }
             }
-            System.out.println(c);
+            throw new IllegalArgumentException("Invalid character: " + c);
         }
 
         int variableCount = highestVariableIndex + 1;
