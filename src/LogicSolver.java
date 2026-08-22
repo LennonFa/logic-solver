@@ -47,6 +47,7 @@ public class LogicSolver {
             if (c == '(' || c == ')' || c == '!') {
 
                 tokens.add(String.valueOf(c));
+                continue;
             }
 
 
@@ -55,8 +56,9 @@ public class LogicSolver {
                 int variableIndex = c - 'a';
                 if (variableIndex > highestVariableIndex) {
                     highestVariableIndex = variableIndex;
-                    continue;
                 }
+
+                continue;
             }
             throw new IllegalArgumentException("Invalid character: " + c);
         }
