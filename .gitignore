@@ -32,3 +32,6 @@ bin/
 
 .idea/
 *.iml
+
+# Compiled classes and tests
+/build/

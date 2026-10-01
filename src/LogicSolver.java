@@ -2,216 +2,118 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class LogicSolver {
-    public static void main(String[] args){
-        //boolean[] values = {false, true};
-        Scanner scanner = new Scanner(System.in);
+    public static void main(String[] args) {
+        try (Scanner scanner = new Scanner(System.in)) {
+            System.out.println("Variables valid: a - z");
+            System.out.println("Enter formula:");
 
-        System.out.println("Variables valid: a - z");
-        System.out.println("Enter formula: ");
-        String formula = scanner.nextLine();
-
-        if (formula.isBlank()) {
-            throw new IllegalArgumentException("No input");
-        }
-
-        //System.out.println("How many variables? ");
-        //int variableCount = scanner.nextInt();
-
-
-        int solution = -1;
-        int checks = 0;
-        int highestVariableIndex = -1;
-
-        boolean satisfiable = false;
-
-        ArrayList<String> tokens = new ArrayList<>();
-
-        for (int i = 0; i < formula.length(); i++) {
-            char c = formula.charAt(i);
-            if (c == ' ') {
-                continue;
+            if (!scanner.hasNextLine()) {
+                System.err.println("Error: No input.");
+                System.exit(1);
+                return;
             }
-            if (c == '&' && i + 1 < formula.length()) {
-                if (formula.charAt(i+1) == '&') {
-                    tokens.add("&&");
-                    i++;
-                    continue;
+
+            String formula = scanner.nextLine();
+            try {
+                Result result = solve(formula);
+                System.out.println("You entered: " + formula);
+                System.out.println(result.satisfiable ? "SAT" : "UNSAT");
+                System.out.println("Checks to complete: " + result.checks);
+
+                if (result.satisfiable) {
+                    for (char name : result.names) {
+                        System.out.println(name + " = " + result.values[name - 'a']);
+                    }
                 }
+            } catch (IllegalArgumentException e) {
+                System.err.println("Error: " + e.getMessage());
+                System.exit(1);
             }
-            if (c == '|' && i + 1 < formula.length()) {
-                if (formula.charAt(i+1) == '|') {
-                    tokens.add("||");
-                    i++;
-                    continue;
-                }
-            }
-
-            if (c == '(' || c == ')' || c == '!') {
-
-                tokens.add(String.valueOf(c));
-                continue;
-            }
-
-
-            if (c >= 'a' && c <= 'z') {
-                tokens.add(String.valueOf(c));
-                int variableIndex = c - 'a';
-                if (variableIndex > highestVariableIndex) {
-                    highestVariableIndex = variableIndex;
-                }
-
-                continue;
-            }
-            throw new IllegalArgumentException("Invalid character: " + c);
-        }
-
-        int variableCount = highestVariableIndex + 1;
-        int combinations = 1 << variableCount;
-        boolean[] variables = new boolean[variableCount];
-
-        System.out.println("You entered: " + formula);
-
-        for (int i = 0; i < combinations; i ++){
-            checks++;
-
-            for (int bit = 0; bit < variableCount; bit++){
-                int mask = 1 << bit;
-
-                variables[bit] = (i & mask) != 0;
-            }
-            //boolean result = evaluateOld(tokens, variables);
-
-            Parser parser = new Parser(tokens, variables);
-            boolean result = parser.parse();
-
-            if (result){
-                satisfiable = true;
-                solution = i;
-                break;}
-        }
-        if (satisfiable){
-            System.out.println("SAT");
-            System.out.println("Checks to complete: " + checks);
-            for (int bit = 0; bit < variableCount; bit++){
-                int mask = 1 << bit;
-
-                boolean value = (solution & mask) != 0;
-
-                System.out.println("Variable["+ bit + "]" + value);
-
-            }
-        } else {
-            System.out.println("UNSAT");
-            System.out.println("Checks to complete: " + checks);
         }
     }
 
-    static boolean evaluateOld(ArrayList<String> tokens, boolean[] values) {
+    static Result solve(String formula) {
+        ArrayList<String> tokens = tokenize(formula);
+        boolean[] present = new boolean[26];
 
-        boolean currentGroup;
-        int indexOpenBracket = -1;
-        int indexCloseBracket = -1;
-        ArrayList<Integer> bracketsStack = new ArrayList<>();
-        ArrayList<Integer> bracketPeers = new ArrayList<>();
-
-        //search bracket
-        for (int j = 0; j < tokens.size(); j++){
-            if (tokens.get(j).equals("(")){
-                bracketsStack.add(j);
-            }
-            if (tokens.get(j).equals(")")){
-                bracketPeers.add(bracketsStack.getLast());
-                bracketPeers.add(j);
-                bracketsStack.removeLast();
+        for (String token : tokens) {
+            char c = token.charAt(0);
+            if (c >= 'a' && c <= 'z') {
+                present[c - 'a'] = true;
             }
         }
-        int f = 0;
-        while (f < bracketPeers.size() - 1){
-            System.out.println("Peer " + bracketPeers.get(f) + " ... " + bracketPeers.get(f + 1));
-            f += 2;
-        }
 
-
-        //build innerTokens
-        ArrayList<String> innerTokens = new ArrayList<>();
-
-        for (int l = 0; l < bracketPeers.size(); l += 2){
-            indexOpenBracket = bracketPeers.get(l);
-            indexCloseBracket = bracketPeers.get(l+1);
-
-            int tokenIndex = indexOpenBracket + 1;
-            while (tokenIndex < indexCloseBracket){
-                innerTokens.add(tokens.get(tokenIndex));
-                tokenIndex++;
-                System.out.println("InnerTokens now : " + innerTokens);
+        ArrayList<Character> names = new ArrayList<>();
+        for (int i = 0; i < present.length; i++) {
+            if (present[i]) {
+                names.add((char) ('a' + i));
             }
-            l++;
         }
 
-        //set first value
-        String firstToken = tokens.get(0);
-        int i;
-        boolean resultSoFar = false;
+        int combinations = 1 << names.size();
+        boolean[] values = new boolean[26];
+        int checks = 0;
 
-        if (tokens.get(0).equals("(")){
-            boolean bracketResult = evaluateOld(innerTokens, values);
-            currentGroup = bracketResult;
-            i = indexCloseBracket + 1;
-        } else if (tokens.get(0).equals("!")) {
-            i = 2;
-            currentGroup = !values[tokens.get(1).charAt(0) - 'a'];
+        for (int i = 0; i < combinations; i++) {
+            // Only used variables get a bit; the parser still indexes values by a-z.
+            for (int bit = 0; bit < names.size(); bit++) {
+                values[names.get(bit) - 'a'] = (i & (1 << bit)) != 0;
+            }
 
-        } else {
-            i = 1;
-            int firstIndex = firstToken.charAt(0) - 'a';
-            currentGroup = values[firstIndex];
+            checks++;
+            Parser parser = new Parser(tokens, values);
+            if (parser.parse()) {
+                return new Result(true, checks, names, values);
+            }
         }
 
-        //calculate
-        while (i < tokens.size()){
-            if (tokens.get(i).equals("&&")){
-                if (tokens.get(i + 1).equals("!")){
-                    int indexRight = tokens.get(i + 2).charAt(0) - 'a';
-                    boolean valueRight = !values[indexRight];
-                    currentGroup = currentGroup && valueRight;
+        return new Result(false, checks, names, values);
+    }
+
+    static ArrayList<String> tokenize(String formula) {
+        if (formula == null || formula.isBlank()) {
+            throw new IllegalArgumentException("No input.");
+        }
+
+        ArrayList<String> tokens = new ArrayList<>();
+        for (int i = 0; i < formula.length(); i++) {
+            char c = formula.charAt(i);
+            if (Character.isWhitespace(c)) {
+                continue;
+            }
+
+            if (c == '&' || c == '|') {
+                if (i + 1 < formula.length() && formula.charAt(i + 1) == c) {
+                    tokens.add(c == '&' ? "&&" : "||");
                     i++;
-                } else if (tokens.get(i  + 1).equals("(")){
-                    boolean valueRight = evaluateOld(innerTokens, values);
-                    currentGroup = currentGroup && valueRight;
-                    i = indexCloseBracket + 1;
                     continue;
-                } else {
-                    int indexRight = tokens.get(i + 1).charAt(0) - 'a';
-                    boolean valueRight = values[indexRight];
-                    currentGroup = currentGroup && valueRight;
                 }
-
-            } else if (tokens.get(i).equals("||")) {
-                if (tokens.get(i + 1).equals("!")){
-                    int indexRight = tokens.get(i + 2).charAt(0) - 'a';
-                    boolean valueRight = !values[indexRight];
-                    resultSoFar = resultSoFar || currentGroup;
-                    currentGroup = valueRight;
-                    i++;
-                } else if (tokens.get(i + 1).equals("(")){
-                    boolean valueRight = evaluateOld(innerTokens, values);
-                    resultSoFar = resultSoFar || currentGroup;
-                    currentGroup = valueRight;
-                    i = indexCloseBracket + 1;
-                    continue;
-                } else {
-                    int index = tokens.get(i + 1).charAt(0) - 'a';
-                    boolean valueRight = values[index];
-                    resultSoFar = resultSoFar || currentGroup;
-                    currentGroup = valueRight;
-                }
-
-            } else {
-                throw new IllegalArgumentException("error");
+                throw new IllegalArgumentException(
+                        "Expected '" + c + c + "' at position " + (i + 1) + ".");
             }
-            i+= 2;
+
+            if (c == '(' || c == ')' || c == '!' || (c >= 'a' && c <= 'z')) {
+                tokens.add(String.valueOf(c));
+                continue;
+            }
+
+            throw new IllegalArgumentException(
+                    "Invalid character '" + c + "' at position " + (i + 1) + ".");
         }
-        resultSoFar = resultSoFar || currentGroup;
-        return resultSoFar;
+        return tokens;
+    }
+
+    static class Result {
+        final boolean satisfiable;
+        final int checks;
+        final ArrayList<Character> names;
+        final boolean[] values;
+
+        Result(boolean satisfiable, int checks, ArrayList<Character> names, boolean[] values) {
+            this.satisfiable = satisfiable;
+            this.checks = checks;
+            this.names = new ArrayList<>(names);
+            this.values = values.clone();
+        }
     }
 }
